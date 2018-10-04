@@ -48,6 +48,7 @@ class ProductForm(AddToCartForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         variant_field = self.fields['variant']
+                
         variant_field.update_field_data(
             self.product.variants, self.discounts, self.taxes)
 

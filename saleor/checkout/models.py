@@ -57,7 +57,7 @@ class Cart(models.Model):
         decimal_places=settings.DEFAULT_DECIMAL_PLACES, default=0)
     discount_name = models.CharField(max_length=255, blank=True, null=True)
     voucher_code = models.CharField(max_length=12, blank=True, null=True)
-
+    
     objects = CartQueryset.as_manager()
 
     class Meta:
@@ -114,6 +114,7 @@ class CartLine(models.Model):
     quantity = models.PositiveIntegerField(
         validators=[MinValueValidator(0), MaxValueValidator(999)])
     data = JSONField(blank=True, default={})
+    param_file = models.FileField(upload_to='saved_files/param_files', blank=True, null=True)
 
     class Meta:
         unique_together = ('cart', 'variant', 'data')
@@ -133,11 +134,11 @@ class CartLine(models.Model):
         return not self == other  # pragma: no cover
 
     def __repr__(self):
-        return 'CartLine(variant=%r, quantity=%r)' % (
-            self.variant, self.quantity)
+        return 'CartLine(variant=%r, quantity=%r, param_file=%r)' % (
+            self.variant, self.quantity, self.param_file)
 
     def __getstate__(self):
-        return self.variant, self.quantity
+        return self.variant, self.quantity, self.param_file
 
     def __setstate__(self, data):
         self.variant, self.quantity = data

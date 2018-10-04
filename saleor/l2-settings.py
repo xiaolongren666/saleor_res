@@ -241,7 +241,8 @@ if DEBUG:
         'debug_toolbar.middleware.DebugToolbarMiddleware')
     INSTALLED_APPS.append('debug_toolbar')
 
-ENABLE_SILK = get_bool_from_env('ENABLE_SILK', False)
+#ENABLE_SILK = get_bool_from_env('ENABLE_SILK', False)
+ENABLE_SILK = True
 if ENABLE_SILK:
     MIDDLEWARE.insert(0, 'silk.middleware.SilkyMiddleware')
     INSTALLED_APPS.append('silk')
@@ -335,7 +336,7 @@ MESSAGE_TAGS = {
 LOW_STOCK_THRESHOLD = 10
 MAX_CART_LINE_QUANTITY = int(os.environ.get('MAX_CART_LINE_QUANTITY', 50))
 
-PAGINATE_BY = 16
+PAGINATE_BY = 10
 DASHBOARD_PAGINATE_BY = 30
 DASHBOARD_SEARCH_LIMIT = 5
 

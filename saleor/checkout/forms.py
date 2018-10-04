@@ -57,6 +57,8 @@ class AddToCartForm(forms.Form):
         self.product = kwargs.pop('product')
         self.discounts = kwargs.pop('discounts', ())
         self.taxes = kwargs.pop('taxes', {})
+        self.upload_file = kwargs.pop('upload_file', {})
+        
         super().__init__(*args, **kwargs)
 
     def clean(self):
@@ -93,9 +95,14 @@ class AddToCartForm(forms.Form):
     def save(self):
         """Add the selected product variant and quantity to the cart."""
         from .utils import add_variant_to_cart
+                
         variant = self.get_variant(self.cleaned_data)
         quantity = self.cleaned_data['quantity']
-        add_variant_to_cart(self.cart, variant, quantity)
+        upload_file = self.upload_file
+        
+        #this is to modify the maximum bought number of a service at a time must be only one.
+        #add_variant_to_cart(self.cart, variant, quantity, check_quantity=True, param_file=upload_file)
+        add_variant_to_cart(self.cart, variant, quantity, replace=True, check_quantity=True, param_file=upload_file)
 
     def get_variant(self, cleaned_data):
         """Return a product variant that matches submitted values.

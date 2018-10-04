@@ -40,14 +40,15 @@ def get_product_images(product):
     return list(product.images.all())
 
 
-def handle_cart_form(request, product, create_cart=False):
+def handle_cart_form(request, product, create_cart=False):    
     if create_cart:
         cart = get_or_create_cart_from_request(request)
     else:
         cart = get_cart_from_request(request)
+    
     form = ProductForm(
         cart=cart, product=product, data=request.POST or None,
-        discounts=request.discounts, taxes=request.taxes)
+        discounts=request.discounts, taxes=request.taxes, upload_file=request.FILES.get('upload_file') or None)
     return form, cart
 
 

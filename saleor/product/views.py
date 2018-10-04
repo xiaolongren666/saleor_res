@@ -51,6 +51,7 @@ def product_details(request, slug, product_id, form=None):
     """
     products = products_with_details(user=request.user)
     product = get_object_or_404(products, id=product_id)
+        
     if product.get_slug() != slug:
         return HttpResponsePermanentRedirect(product.get_absolute_url())
     today = datetime.date.today()
@@ -67,7 +68,9 @@ def product_details(request, slug, product_id, form=None):
     product_attributes = get_product_attributes_data(product)
     # show_variant_picker determines if variant picker is used or select input
     show_variant_picker = all([v.attributes for v in product.variants.all()])
+    #show_variant_picker = False
     json_ld_data = product_json_ld(product, product_attributes)
+    
     ctx = {
         'is_visible': is_visible,
         'form': form,
@@ -90,7 +93,7 @@ def product_add_to_cart(request, slug, product_id):
         return redirect(reverse(
             'product:details',
             kwargs={'product_id': product_id, 'slug': slug}))
-
+        
     products = products_for_cart(user=request.user)
     product = get_object_or_404(products, pk=product_id)
     form, cart = handle_cart_form(request, product, create_cart=True)

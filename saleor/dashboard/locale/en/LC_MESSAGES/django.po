@@ -1381,6 +1381,36 @@ msgctxt "Product published toggle"
 msgid "Published"
 msgstr ""
 
+#: saleor/dashboard/product/forms.py:213
+msgctxt "Product upload toggle"
+msgid "Needupload"
+msgstr ""
+
+#: saleor/dashboard/product/forms.py:213
+msgctxt "Product download toggle"
+msgid "Needdownload"
+msgstr ""
+
+#: saleor/dashboard/product/forms.py:213
+msgctxt "Product upload change toggle"
+msgid "Uploadchange"
+msgstr ""
+
+#: saleor/dashboard/product/forms.py:213
+msgctxt "Product download change toggle"
+msgid "Downloadchange"
+msgstr ""
+
+#: saleor/dashboard/product/forms.py:213
+msgctxt "Product upload name toggle"
+msgid "Uploadname"
+msgstr ""
+
+#: saleor/dashboard/product/forms.py:213
+msgctxt "Product download name toggle"
+msgid "Downloadname"
+msgstr ""
+
 #: saleor/dashboard/product/forms.py:216
 msgctxt "Featured product toggle"
 msgid "Feature this product on homepage"

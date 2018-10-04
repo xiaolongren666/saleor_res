@@ -5,7 +5,7 @@ import { observer } from 'mobx-react';
 import React, { Component, PropTypes } from 'react';
 
 import AttributeSelectionWidget from './AttributeSelectionWidget';
-import QuantityInput from './QuantityInput';
+//import QuantityInput from './QuantityInput';
 import * as queryString from 'query-string';
 
 export default observer(class VariantPicker extends Component {
@@ -18,12 +18,13 @@ export default observer(class VariantPicker extends Component {
     variants: PropTypes.array.isRequired
   };
 
-  constructor (props) {
+  constructor(props) {
     super(props);
     const { variants } = this.props;
 
     const variant = variants.filter(v => !!Object.keys(v.attributes).length)[0];
     const params = queryString.parse(location.search);
+
     let selection = {};
     if (Object.keys(params).length) {
       Object.keys(params)
@@ -43,12 +44,15 @@ export default observer(class VariantPicker extends Component {
     } else if (Object.keys(variant).length) {
       selection = variant.attributes;
     }
+
+    let disabledValue = this.matchVariantFromSelection(selection);
     this.state = {
       errors: {},
       quantity: 1,
-      selection: selection
+      selection: selection,
+      param_file_disabled: disabledValue,
+      upload_file: null
     };
-    this.matchVariantFromSelection();
   }
 
   checkVariantAvailability = () => {
@@ -58,15 +62,21 @@ export default observer(class VariantPicker extends Component {
 
   handleAddToCart = () => {
     const { onAddToCartSuccess, onAddToCartError, store } = this.props;
-    const { quantity } = this.state;
+    const { quantity, upload_file } = this.state;
+
     if (quantity > 0 && !store.isEmpty) {
+      var formData = new FormData();
+
+      formData.append('quantity', quantity)
+      formData.append('variant', store.variant.id)
+      formData.append('upload_file', upload_file)
+
       $.ajax({
         url: this.props.url,
-        method: 'post',
-        data: {
-          quantity: quantity,
-          variant: store.variant.id
-        },
+        method: 'POST',
+        contentType: false,
+        processData: false,
+        data: formData,
         success: () => {
           onAddToCartSuccess();
         },
@@ -81,7 +91,8 @@ export default observer(class VariantPicker extends Component {
     this.setState({
       selection: Object.assign({}, this.state.selection, { [attrId]: valueId })
     }, () => {
-      this.matchVariantFromSelection();
+      let disabledValue = this.matchVariantFromSelection(this.state.selection);
+      this.setState({ param_file_disabled: disabledValue })
       let params = {};
       Object.keys(this.state.selection)
         .forEach(attrId => {
@@ -97,6 +108,11 @@ export default observer(class VariantPicker extends Component {
 
   handleQuantityChange = (event) => {
     this.setState({ quantity: parseInt(event.target.value) });
+  };
+
+  handleFileChange = (event) => {
+    const file = event.target.files[0];
+    this.setState({ upload_file: file })
   };
 
   matchAttribute = (id) => {
@@ -121,20 +137,23 @@ export default observer(class VariantPicker extends Component {
     return match.length > 0 ? match[0] : null;
   };
 
-  matchVariantFromSelection () {
+  matchVariantFromSelection(selection) {
     const { store, variants } = this.props;
     let matchedVariant = null;
     variants.forEach(variant => {
-      if (_.isEqual(this.state.selection, variant.attributes)) {
+      if (_.isEqual(selection, variant.attributes)) {
         matchedVariant = variant;
       }
     });
     store.setVariant(matchedVariant);
+
+    const disabledValue = !matchedVariant.needupload;
+    return disabledValue
   }
 
-  render () {
+  render() {
     const { store, variantAttributes } = this.props;
-    const { errors, selection, quantity } = this.state;
+    const { errors, selection, quantity, param_file_disabled, upload_file } = this.state;
     const disableAddToCart = store.isEmpty || !this.checkVariantAvailability();
 
     const addToCartBtnClasses = classNames({
@@ -144,21 +163,16 @@ export default observer(class VariantPicker extends Component {
 
     return (
       <div>
-        {variantAttributes.map((attribute, i) =>
-          <AttributeSelectionWidget
-            attribute={attribute}
-            handleChange={this.handleAttributeChange}
-            key={i}
-            selected={selection[attribute.pk]}
-          />
-        )}
+        <AttributeSelectionWidget
+          errors={errors.upload_file}
+          variantAttributes={variantAttributes}
+          selection={selection}
+          handleAttributeChange={this.handleAttributeChange}
+          param_file_disabled={param_file_disabled}
+          handleFileChange={this.handleFileChange}
+        />
         <div className="clearfix">
-          <QuantityInput
-            errors={errors.quantity}
-            handleChange={this.handleQuantityChange}
-            quantity={quantity}
-          />
-          <div className="form-group product__info__button">
+          <div className="form-group">
             <button
               className={addToCartBtnClasses}
               onClick={this.handleAddToCart}

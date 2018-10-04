@@ -112,6 +112,8 @@ class Product(SeoModel):
     charge_taxes = models.BooleanField(default=True)
     tax_rate = models.CharField(
         max_length=128, default=DEFAULT_TAX_RATE_NAME, blank=True)
+    #is_needupload = models.BooleanField(default=True)
+    #upload_file = models.FileField(upload_to='saved_files/%Y%m%d', blank=True, null=True)
 
     objects = ProductQuerySet.as_manager()
 
@@ -193,6 +195,14 @@ class ProductVariant(models.Model):
     cost_price = MoneyField(
         currency=settings.DEFAULT_CURRENCY, max_digits=12,
         decimal_places=settings.DEFAULT_DECIMAL_PLACES, blank=True, null=True)
+    is_need_upload = models.BooleanField(default=True)
+    is_need_download = models.BooleanField(default=True)
+    is_upload_change = models.BooleanField(default=False)
+    is_download_change = models.BooleanField(default=False)
+    upload_name = models.CharField(max_length=255, blank=True)
+    download_name = models.CharField(max_length=255, blank=True)
+    exe_name = models.CharField(max_length=255, default='exe.py')
+    work_base = models.CharField(max_length=255, blank=True, null=True)
 
     class Meta:
         app_label = 'product'
