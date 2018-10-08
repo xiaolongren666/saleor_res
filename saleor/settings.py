@@ -51,7 +51,7 @@ CACHES = {'default': django_cache_url.config()}
 
 DATABASES = {
     'default': dj_database_url.config(
-        default='postgres://simm:simm@localhost:5432/web',
+        default='postgres://simm:simm@localhost:5432/xlr',
         conn_max_age=600)}
 
 
